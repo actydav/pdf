@@ -425,6 +425,43 @@
     }
     .result p { color: var(--muted); margin-bottom: 1rem; }
 
+    /* Aviso iOS */
+    .ios-hint {
+      margin-top: 0.8rem;
+      padding: 0.9rem 1rem;
+      background: rgba(255, 193, 7, 0.12);
+      border: 1px solid rgba(255, 193, 7, 0.35);
+      border-radius: 12px;
+      font-size: 0.82rem;
+      color: #ffd97a;
+      line-height: 1.5;
+      text-align: left;
+    }
+    .ios-hint strong { color: #ffc107; }
+
+    /* Imágenes previsualizadas en iOS */
+    .ios-img-preview {
+      max-width: 100%;
+      margin-top: 0.6rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      display: block;
+    }
+    .ios-img-tip {
+      font-size: 0.75rem;
+      color: #ffd97a;
+      margin-top: 0.3rem;
+      text-align: center;
+      width: 100%;
+    }
+    .ios-img-block {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
     /* Footer */
     footer {
       text-align: center;
@@ -693,6 +730,10 @@
     // ========== PDF.js worker ==========
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+    // ========== Detección de iOS ==========
+    const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
     // ========== Helpers ==========
     function formatSize(bytes) {
       if (bytes < 1024) return bytes + ' B';
@@ -704,16 +745,38 @@
       const t = document.getElementById('toast');
       t.textContent = msg;
       t.className = 'toast show ' + type;
-      setTimeout(() => t.classList.remove('show'), 3500);
+      setTimeout(() => t.classList.remove('show'), 4000);
     }
 
     // Limpia caracteres inválidos para nombres de archivo
     function sanitizeName(name, fallback = 'archivo') {
       const cleaned = (name || '')
-        .replace(/[\/\\:*?"<>|]/g, '')   // caracteres inválidos
-        .replace(/\s+/g, ' ')            // espacios múltiples
+        .replace(/[\/\\:*?"<>|]/g, '')
+        .replace(/\s+/g, ' ')
         .trim();
       return cleaned || fallback;
+    }
+
+    // Abre un Blob en nueva pestaña (iOS) o descarga (escritorio)
+    function downloadOrOpen(blob, filename) {
+      if (IS_IOS) {
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        showToast('En la página que se abre, toca Compartir (⬆️) → Guardar en Archivos', '');
+      } else {
+        saveAs(blob, filename);
+      }
+    }
+
+    // Muestra un aviso de iOS en el contenedor indicado
+    function showIosHint(container) {
+      if (!IS_IOS) return;
+      if (container.querySelector('.ios-hint')) return;
+      const hint = document.createElement('div');
+      hint.className = 'ios-hint';
+      hint.innerHTML = '<strong>📱 En iPhone:</strong> se abrirá una vista previa. Toca el botón <strong>Compartir</strong> (⬆️) abajo y elige <strong>"Guardar en Archivos"</strong>.';
+      container.appendChild(hint);
     }
 
     // ========== Setup drop zones ==========
@@ -768,7 +831,6 @@
         if (f.size > 200 * 1024 * 1024) showToast(`Archivo grande: ${f.name} (${formatSize(f.size)})`, '');
         imgFiles.push(f);
       });
-      // Si el campo de nombre está vacío, sugerir nombre
       const nameInput = document.getElementById('nameImg');
       if (!nameInput.value.trim() && imgs[0]) {
         nameInput.value = (imgs[0].name.replace(/\.[^.]+$/, '') || 'imagenes-convertidas');
@@ -831,7 +893,10 @@
       const fill = document.getElementById('fillImg');
       const text = document.getElementById('textImg');
       prog.classList.add('show');
-      document.getElementById('resultImg').classList.remove('show');
+      const resultBox = document.getElementById('resultImg');
+      resultBox.classList.remove('show');
+      const oldHint = resultBox.querySelector('.ios-hint');
+      if (oldHint) oldHint.remove();
 
       try {
         const { PDFDocument } = PDFLib;
@@ -863,20 +928,33 @@
             }
           }
 
-          let w = img.width, h = img.height;
+          // ===== Cálculo de dimensiones de página con orientación =====
+          let baseW = img.width, baseH = img.height;
+
           if (pageSize === 'A4') {
-            const A4 = [595.28, 841.89];
-            if (orient === 'landscape' || (orient === 'auto' && w > h)) {
-              w = A4[1]; h = A4[0];
-            } else {
-              w = A4[0]; h = A4[1];
-            }
+            baseW = 595.28; baseH = 841.89;
           } else if (pageSize === 'Letter') {
-            const L = [612, 792];
-            if (orient === 'landscape' || (orient === 'auto' && w > h)) {
-              w = L[1]; h = L[0];
-            } else {
-              w = L[0]; h = L[1];
+            baseW = 612; baseH = 792;
+          }
+          // Si es 'auto', baseW/baseH son las dimensiones originales de la imagen
+
+          let w, h;
+
+          if (orient === 'portrait') {
+            // Forzar vertical: lado corto = ancho, lado largo = alto
+            w = Math.min(baseW, baseH);
+            h = Math.max(baseW, baseH);
+          } else if (orient === 'landscape') {
+            // Forzar horizontal: lado largo = ancho, lado corto = alto
+            w = Math.max(baseW, baseH);
+            h = Math.min(baseW, baseH);
+          } else {
+            // 'auto': respetar proporción
+            w = baseW;
+            h = baseH;
+            // Si es A4/Letter y la imagen es horizontal, rotar la página
+            if ((pageSize === 'A4' || pageSize === 'Letter') && img.width > img.height) {
+              [w, h] = [h, w];
             }
           }
 
@@ -898,7 +976,8 @@
         lastPdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
         fill.style.width = '100%';
         text.textContent = '¡Listo!';
-        document.getElementById('resultImg').classList.add('show');
+        resultBox.classList.add('show');
+        showIosHint(resultBox);
         showToast('PDF generado correctamente', 'success');
       } catch (err) {
         console.error(err);
@@ -912,7 +991,7 @@
     document.getElementById('dlImg').onclick = () => {
       if (lastPdfBlob) {
         const base = sanitizeName(document.getElementById('nameImg').value, 'imagenes-convertidas');
-        saveAs(lastPdfBlob, base + '.pdf');
+        downloadOrOpen(lastPdfBlob, base + '.pdf');
       }
     };
 
@@ -924,7 +1003,6 @@
       const f = files[0];
       if (!f || f.type !== 'application/pdf') return showToast('Selecciona un PDF', 'error');
       pdfWordFile = f;
-      // Sugerir nombre basado en el PDF original
       const nameInput = document.getElementById('nameWord');
       nameInput.value = f.name.replace(/\.pdf$/i, '') || 'documento';
       renderPdfWordList();
@@ -972,7 +1050,10 @@
       const fill = document.getElementById('fillPdfWord');
       const text = document.getElementById('textPdfWord');
       prog.classList.add('show');
-      document.getElementById('resultPdfWord').classList.remove('show');
+      const resultBox = document.getElementById('resultPdfWord');
+      resultBox.classList.remove('show');
+      const oldHint = resultBox.querySelector('.ios-hint');
+      if (oldHint) oldHint.remove();
 
       try {
         text.textContent = 'Cargando PDF...';
@@ -1024,7 +1105,8 @@
         lastDocxBlob = blob;
         fill.style.width = '100%';
         text.textContent = '¡Listo!';
-        document.getElementById('resultPdfWord').classList.add('show');
+        resultBox.classList.add('show');
+        showIosHint(resultBox);
         showToast('Documento Word generado', 'success');
       } catch (err) {
         console.error(err);
@@ -1038,7 +1120,7 @@
     document.getElementById('dlPdfWord').onclick = () => {
       if (lastDocxBlob) {
         const base = sanitizeName(document.getElementById('nameWord').value, 'documento');
-        saveAs(lastDocxBlob, base + '.docx');
+        downloadOrOpen(lastDocxBlob, base + '.docx');
       }
     };
 
@@ -1107,7 +1189,10 @@
       const fill = document.getElementById('fillPdfImg');
       const text = document.getElementById('textPdfImg');
       prog.classList.add('show');
-      document.getElementById('resultPdfImg').classList.remove('show');
+      const resultBox = document.getElementById('resultPdfImg');
+      resultBox.classList.remove('show');
+      const oldHint = resultBox.querySelector('.ios-hint');
+      if (oldHint) oldHint.remove();
       const links = document.getElementById('dlPdfImgLinks');
       links.innerHTML = '';
 
@@ -1138,19 +1223,44 @@
           });
           const url = URL.createObjectURL(blob);
           const filename = `${prefix}-${String(i).padStart(3, '0')}.${ext}`;
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = filename;
-          a.className = 'btn btn-secondary';
-          a.style.fontSize = '0.85rem';
-          a.textContent = `⬇️ Pág. ${i}`;
-          links.appendChild(a);
+
+          if (IS_IOS) {
+            const block = document.createElement('div');
+            block.className = 'ios-img-block';
+
+            const label = document.createElement('div');
+            label.style.cssText = 'font-size:0.85rem; color:var(--text); margin-bottom:0.3rem;';
+            label.textContent = `Página ${i}`;
+            block.appendChild(label);
+
+            const img = document.createElement('img');
+            img.src = url;
+            img.className = 'ios-img-preview';
+            img.alt = `Página ${i}`;
+            block.appendChild(img);
+
+            const tip = document.createElement('div');
+            tip.className = 'ios-img-tip';
+            tip.textContent = 'Mantén presionada la imagen para guardarla en tu galería';
+            block.appendChild(tip);
+
+            links.appendChild(block);
+          } else {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.className = 'btn btn-secondary';
+            a.style.fontSize = '0.85rem';
+            a.textContent = `⬇️ Pág. ${i}`;
+            links.appendChild(a);
+          }
         }
 
         fill.style.width = '100%';
         text.textContent = '¡Listo!';
         document.getElementById('msgPdfImg').textContent = `${numPages} imagen(es) lista(s)`;
-        document.getElementById('resultPdfImg').classList.add('show');
+        resultBox.classList.add('show');
+        showIosHint(resultBox);
         showToast(`${numPages} imagen(es) generadas`, 'success');
       } catch (err) {
         console.error(err);
