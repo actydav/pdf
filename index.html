@@ -287,6 +287,27 @@
       width: 70px;
     }
 
+    /* Checkbox estilizado */
+    .options label.checkbox-label {
+      cursor: pointer;
+      gap: 0.6rem;
+      padding: 0.5rem 0.8rem;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: border-color 0.2s;
+    }
+    .options label.checkbox-label:hover {
+      border-color: var(--accent);
+    }
+    .options input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      min-height: auto;
+      accent-color: #06b6d4;
+      cursor: pointer;
+    }
+
     /* Campo de nombre de archivo */
     .name-field {
       margin-top: 1.2rem;
@@ -536,6 +557,7 @@
       .btn { width: 100%; }
       .options { flex-direction: column; align-items: stretch; }
       .options label { justify-content: space-between; }
+      .options label.checkbox-label { justify-content: flex-start; }
       .options select, .options input[type="number"] { flex: 1; max-width: 60%; }
       .toast { right: 1rem; left: 1rem; }
     }
@@ -601,6 +623,10 @@
             <option value="portrait">Vertical</option>
             <option value="landscape">Horizontal</option>
           </select>
+        </label>
+        <label class="checkbox-label" title="Rota la imagen 90° si su orientación no coincide con la página">
+          <input type="checkbox" id="rotateFit" />
+          Rotar imagen para ajustar
         </label>
       </div>
       <div class="name-field" id="nameImgWrap" style="display:none">
@@ -748,7 +774,6 @@
       setTimeout(() => t.classList.remove('show'), 4000);
     }
 
-    // Limpia caracteres inválidos para nombres de archivo
     function sanitizeName(name, fallback = 'archivo') {
       const cleaned = (name || '')
         .replace(/[\/\\:*?"<>|]/g, '')
@@ -757,7 +782,6 @@
       return cleaned || fallback;
     }
 
-    // Abre un Blob en nueva pestaña (iOS) o descarga (escritorio)
     function downloadOrOpen(blob, filename) {
       if (IS_IOS) {
         const url = URL.createObjectURL(blob);
@@ -769,7 +793,6 @@
       }
     }
 
-    // Muestra un aviso de iOS en el contenedor indicado
     function showIosHint(container) {
       if (!IS_IOS) return;
       if (container.querySelector('.ios-hint')) return;
@@ -899,10 +922,11 @@
       if (oldHint) oldHint.remove();
 
       try {
-        const { PDFDocument } = PDFLib;
+        const { PDFDocument, degrees } = PDFLib;
         const pdfDoc = await PDFDocument.create();
         const pageSize = document.getElementById('pageSize').value;
         const orient = document.getElementById('orientation').value;
+        const rotateToFit = document.getElementById('rotateFit').checked;
 
         for (let i = 0; i < imgFiles.length; i++) {
           text.textContent = `Procesando imagen ${i + 1} de ${imgFiles.length}...`;
@@ -959,15 +983,39 @@
           }
 
           const page = pdfDoc.addPage([w, h]);
-          const scale = Math.min(w / img.width, h / img.height);
-          const drawW = img.width * scale;
-          const drawH = img.height * scale;
-          page.drawImage(img, {
-            x: (w - drawW) / 2,
-            y: (h - drawH) / 2,
-            width: drawW,
-            height: drawH
-          });
+
+          // ¿Rotar la imagen 90° si no coincide con la orientación de la página?
+          const imgIsLandscape = img.width > img.height;
+          const pageIsLandscape = w > h;
+          const needsRotate = rotateToFit && (imgIsLandscape !== pageIsLandscape);
+
+          if (needsRotate) {
+            // Rotamos la imagen 90° (en sentido antihorario) para que encaje.
+            // pdf-lib aplica la rotación alrededor del punto (x, y).
+            // Para que quede centrada y no se salga, calculamos:
+            const scale = Math.min(w / img.height, h / img.width);
+            const drawW = img.height * scale;
+            const drawH = img.width * scale;
+
+            page.drawImage(img, {
+              x: (w - drawW) / 2 + drawW,
+              y: (h - drawH) / 2,
+              width: drawH,
+              height: drawW,
+              rotate: degrees(90)
+            });
+          } else {
+            // Sin rotación: comportamiento normal
+            const scale = Math.min(w / img.width, h / img.height);
+            const drawW = img.width * scale;
+            const drawH = img.height * scale;
+            page.drawImage(img, {
+              x: (w - drawW) / 2,
+              y: (h - drawH) / 2,
+              width: drawW,
+              height: drawH
+            });
+          }
         }
 
         text.textContent = 'Generando PDF...';
