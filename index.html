@@ -728,14 +728,56 @@
       return cleaned || fallback;
     }
 
-    // Descargar en escritorio, abrir vista previa en iOS (sin carteles)
-    function downloadOrOpen(blob, filename) {
-      if (IS_IOS) {
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        setTimeout(() => URL.revokeObjectURL(url), 60000);
-      } else {
+    // En iOS compartimos un File con nombre, no la URL de un Blob sin nombre.
+    let isSharingFile = false;
+
+    async function downloadOrOpen(blob, filename) {
+      if (!IS_IOS) {
         saveAs(blob, filename);
+        return;
+      }
+
+      // Evitar abrir dos menús si se toca Descargar varias veces seguidas.
+      if (isSharingFile) return;
+
+      try {
+        const file = new File([blob], filename, {
+          type: blob.type || 'application/octet-stream'
+        });
+
+        if (
+          typeof navigator.share === 'function' &&
+          typeof navigator.canShare === 'function' &&
+          navigator.canShare({ files: [file] })
+        ) {
+          isSharingFile = true;
+          // Se llama desde el clic, con el archivo ya generado. No añadir
+          // esperas antes de share(): necesita la activación del usuario.
+          // El nombre lo lleva File.name; un título no reemplaza ese nombre.
+          await navigator.share({ files: [file] });
+          return;
+        }
+
+        // Alternativa cuando el navegador no permite compartir archivos.
+        // download sugiere el nombre; algunos visores de iOS pueden ignorarlo.
+        const url = URL.createObjectURL(file);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        showToast('Si se abre una vista previa, revisa el nombre al guardar en Archivos.');
+      } catch (err) {
+        // Cancelar el menú es normal: no abrir otra pestaña ni descargar.
+        if (err.name !== 'AbortError') {
+          console.error(err);
+          showToast('No se pudo guardar. Abre la página en Safari con HTTPS e inténtalo de nuevo.', 'error');
+        }
+      } finally {
+        isSharingFile = false;
       }
     }
 
