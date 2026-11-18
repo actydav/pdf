@@ -621,7 +621,7 @@
       .btn { width: 100%; }
       .options { flex-direction: column; align-items: stretch; }
       .options label { justify-content: space-between; }
-      .options select, .options input[type="number"] { flex: 1; max-width: 60%; }
+      .options select, .options input[type="number"] { flex: 1; max-width: 62%; }
       .toast { right: 1rem; left: 1rem; }
     }
 
@@ -661,8 +661,14 @@
           Tamaño de página:
           <select id="pageSize">
             <option value="auto">Ajustar a imagen</option>
-            <option value="A4" selected>A4</option>
-            <option value="Letter">Letter</option>
+            <option value="Letter" selected>Carta (21.6 × 27.9 cm)</option>
+            <option value="Oficio">Oficio (21.6 × 33.0 cm)</option>
+            <option value="Legal">Legal (21.6 × 35.6 cm)</option>
+            <option value="A4">A4 (21.0 × 29.7 cm)</option>
+            <option value="A3">A3 (29.7 × 42.0 cm)</option>
+            <option value="A5">A5 (14.8 × 21.0 cm)</option>
+            <option value="Executive">Ejecutivo (18.4 × 26.7 cm)</option>
+            <option value="Tabloid">Tabloide (27.9 × 43.2 cm)</option>
           </select>
         </label>
         <label>
@@ -804,6 +810,18 @@
     // ========== Detección de iOS ==========
     const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    // ========== Tamaños de página estándar (en puntos PDF: 1 in = 72 pt) ==========
+    const PAGE_SIZES = {
+      Letter: [612, 792],        // Carta: 21.6 x 27.9 cm
+      Oficio: [612, 936],        // Oficio: 21.6 x 33.0 cm
+      Legal: [612, 1008],        // Legal: 21.6 x 35.6 cm
+      A4: [595.28, 841.89],      // A4: 21.0 x 29.7 cm
+      A3: [841.89, 1190.55],     // A3: 29.7 x 42.0 cm
+      A5: [419.53, 595.28],      // A5: 14.8 x 21.0 cm
+      Executive: [522, 756],     // Ejecutivo: 18.4 x 26.7 cm
+      Tabloid: [792, 1224]       // Tabloide: 27.9 x 43.2 cm
+    };
 
     // ========== Helpers ==========
     function formatSize(bytes) {
@@ -1118,12 +1136,8 @@
           let baseW = img.width;
           let baseH = img.height;
 
-          if (pageSize === 'A4') {
-            baseW = 595.28;
-            baseH = 841.89;
-          } else if (pageSize === 'Letter') {
-            baseW = 612;
-            baseH = 792;
+          if (pageSize !== 'auto' && PAGE_SIZES[pageSize]) {
+            [baseW, baseH] = PAGE_SIZES[pageSize];
           }
 
           let w = baseW;
