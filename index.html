@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="format-detection" content="telephone=no" />
-  <title>Conversor de Documentos | PDF · Word · Imágenes</title>
+  <title>Convertidor</title>
   <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.cjs"></script>
@@ -55,25 +55,24 @@
 
     header {
       text-align: center;
-      padding: 2.4rem 1rem 1.6rem;
+      padding: 2.3rem 1rem 1.5rem;
       background: linear-gradient(180deg, var(--primary-soft) 0%, #ffffff 100%);
       border-bottom: 1px solid var(--border);
       animation: fadeDown 0.5s ease-out;
     }
     header h1 {
-      font-size: clamp(1.55rem, 4.5vw, 2.25rem);
+      font-size: clamp(1.65rem, 5vw, 2.4rem);
       font-weight: 700;
       color: var(--primary);
       letter-spacing: -0.02em;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.35rem;
       line-height: 1.2;
     }
     header p {
       color: var(--muted);
       font-size: 0.96rem;
-      max-width: 540px;
-      margin: 0 auto;
-      line-height: 1.45;
+      font-weight: 500;
+      padding: 0 0.5rem;
     }
     .badge {
       display: inline-block;
@@ -82,10 +81,10 @@
       background: #ffffff;
       color: var(--primary);
       border-radius: 999px;
-      font-size: 0.76rem;
+      font-size: 0.78rem;
       font-weight: 600;
-      letter-spacing: 0.02em;
       border: 1px solid var(--primary-border);
+      max-width: 90%;
     }
 
     .tabs-wrap {
@@ -97,7 +96,7 @@
       margin: 0 auto;
       display: flex;
       justify-content: center;
-      gap: 0.5rem;
+      gap: 0.45rem;
       background: var(--surface-alt);
       padding: 0.4rem;
       border-radius: 12px;
@@ -171,7 +170,7 @@
       background: #ffffff;
       border: 1px solid var(--primary-border);
       color: var(--primary);
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -179,7 +178,7 @@
       box-shadow: 0 2px 8px rgba(158, 27, 50, 0.08);
     }
     .drop-zone h3 {
-      font-size: 1.05rem;
+      font-size: 1.06rem;
       font-weight: 600;
       color: var(--text);
       margin-bottom: 0.35rem;
@@ -189,12 +188,6 @@
       color: var(--muted);
       font-size: 0.85rem;
       pointer-events: none;
-    }
-    .drop-zone .sub-hint {
-      margin-top: 0.45rem;
-      font-size: 0.78rem;
-      color: var(--primary);
-      font-weight: 500;
     }
 
     .drop-zone input[type="file"] {
@@ -507,18 +500,9 @@
     }
     .result.show { display: block; }
     .result .success-icon {
-      width: 44px;
-      height: 44px;
-      margin: 0 auto 0.65rem;
-      border-radius: 50%;
-      background: var(--success-bg);
-      color: var(--success);
-      border: 1px solid #99f6e4;
-      font-size: 1.3rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-size: 2.3rem;
+      margin-bottom: 0.5rem;
+      animation: bounce 0.6s ease;
     }
     .result p {
       color: var(--text);
@@ -565,16 +549,20 @@
 
     footer {
       text-align: center;
-      padding: 1.4rem 1rem calc(1.4rem + env(safe-area-inset-bottom));
-      color: var(--muted);
-      font-size: 0.8rem;
+      padding: 1.5rem 1rem calc(1.5rem + env(safe-area-inset-bottom));
       background: var(--surface-alt);
       border-top: 1px solid var(--border);
       margin-top: auto;
     }
-    footer strong {
-      color: var(--primary);
-      font-weight: 600;
+
+    .gatopanzon {
+      display: block;
+      margin: 0 auto;
+      width: clamp(110px, 20%, 220px);
+      height: auto;
+      border-radius: 18px;
+      border: 2px solid var(--primary-border);
+      box-shadow: 0 4px 14px rgba(158, 27, 50, 0.12);
     }
 
     @keyframes fadeDown {
@@ -588,6 +576,10 @@
     @keyframes slideIn {
       from { opacity: 0; transform: translateX(-8px); }
       to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
     }
 
     .toast {
@@ -640,9 +632,9 @@
 </head>
 <body>
   <header>
-    <h1>Conversor de Documentos</h1>
-    <p>Herramienta académica y profesional para convertir entre Imágenes, PDF y Word</p>
-    <span class="badge">Procesamiento local y seguro en su navegador</span>
+    <h1>pal pdf chavales</h1>
+    <p>Imágenes ↔ PDF ↔ Word</p>
+    <span class="badge">conviertan sus cosas</span>
   </header>
 
   <div class="tabs-wrap">
@@ -658,9 +650,9 @@
     <section id="img2pdf" class="panel active">
       <div class="drop-zone" id="dropImg">
         <div class="icon">📷</div>
-        <h3>Arrastra tus imágenes aquí o haz clic para seleccionar</h3>
-        <p>Formatos compatibles: JPG, PNG, WebP, GIF, BMP</p>
-        <p class="sub-hint">Detección automática de orientación y rotación individual por página</p>
+        <h3>Arrastra imágenes aquí o presiona aquí</h3>
+        <p>JPG, PNG, WebP, GIF, BMP</p>
+        <p style="margin-top:0.4rem;font-size:0.8rem;color:var(--primary);font-weight:500;">Soporta archivos grandes (100 MB o ma')</p>
         <input type="file" id="inputImg" accept="image/*" multiple />
       </div>
       <div class="file-list" id="listImg"></div>
@@ -670,11 +662,11 @@
           <select id="pageSize">
             <option value="auto">Ajustar a imagen</option>
             <option value="A4" selected>A4</option>
-            <option value="Letter">Carta (Letter)</option>
+            <option value="Letter">Letter</option>
           </select>
         </label>
         <label>
-          Orientación de hoja:
+          Orientación:
           <select id="orientation">
             <option value="auto">Automática</option>
             <option value="portrait">Vertical</option>
@@ -683,9 +675,9 @@
         </label>
       </div>
       <div class="name-field" id="nameImgWrap" style="display:none">
-        <label for="nameImg">Nombre del archivo PDF</label>
+        <label for="nameImg">Nombre del PDF</label>
         <div class="name-input-wrap">
-          <input type="text" id="nameImg" placeholder="documento-convertido" autocomplete="off" spellcheck="false" />
+          <input type="text" id="nameImg" placeholder="imagenes-convertidas" autocomplete="off" spellcheck="false" />
           <span class="ext">.pdf</span>
         </div>
       </div>
@@ -693,15 +685,15 @@
         <button class="btn btn-primary" id="btnImg2Pdf" disabled>
           Convertir a PDF
         </button>
-        <button class="btn btn-secondary" id="btnClearImg" style="display:none">Limpiar lista</button>
+        <button class="btn btn-secondary" id="btnClearImg" style="display:none">Limpiar</button>
       </div>
       <div class="progress-wrap" id="progImg">
         <div class="progress-bar"><div class="progress-fill" id="fillImg"></div></div>
-        <div class="progress-text" id="textImg">Preparando documentos...</div>
+        <div class="progress-text" id="textImg">Preparando...</div>
       </div>
       <div class="result" id="resultImg">
-        <div class="success-icon">✓</div>
-        <p>El archivo PDF se ha generado correctamente</p>
+        <div class="success-icon">✅</div>
+        <p>PDF listo</p>
         <button class="btn btn-primary" id="dlImg">Descargar PDF</button>
       </div>
     </section>
@@ -710,9 +702,9 @@
     <section id="pdf2word" class="panel">
       <div class="drop-zone" id="dropPdfWord">
         <div class="icon">📄</div>
-        <h3>Arrastra un archivo PDF aquí o haz clic para seleccionar</h3>
-        <p>Extracción de texto estructurado a formato editable (.docx)</p>
-        <p class="sub-hint">Recomendado para documentos PDF con texto seleccionable</p>
+        <h3>Arrastra un PDF aquí</h3>
+        <p>o toca para seleccionar · Se extraerá el texto</p>
+        <p style="margin-top:0.4rem;font-size:0.8rem;color:var(--primary);font-weight:500;">Ideal para PDFs con texto seleccionable</p>
         <input type="file" id="inputPdfWord" accept=".pdf,application/pdf" />
       </div>
       <div class="file-list" id="listPdfWord"></div>
@@ -731,15 +723,15 @@
       </div>
       <div class="progress-wrap" id="progPdfWord">
         <div class="progress-bar"><div class="progress-fill" id="fillPdfWord"></div></div>
-        <div class="progress-text" id="textPdfWord">Preparando extracción...</div>
+        <div class="progress-text" id="textPdfWord">Preparando...</div>
       </div>
       <div class="result" id="resultPdfWord">
-        <div class="success-icon">✓</div>
-        <p>Documento Word listo para descargar</p>
+        <div class="success-icon">✅</div>
+        <p>¡Documento Word listo!</p>
         <button class="btn btn-primary" id="dlPdfWord">Descargar DOCX</button>
       </div>
       <p class="note-text">
-        Nota: Esta herramienta extrae el texto seleccionable del documento. Los archivos PDF escaneados como imagen no contienen texto editable.
+        Nota: convierte texto. PDFs escaneados (solo imagen) no tendrán texto editable.
       </p>
     </section>
 
@@ -747,9 +739,8 @@
     <section id="pdf2img" class="panel">
       <div class="drop-zone" id="dropPdfImg">
         <div class="icon">🖼️</div>
-        <h3>Arrastra un archivo PDF aquí o haz clic para seleccionar</h3>
-        <p>Cada página del documento se exportará como una imagen independiente</p>
-        <p class="sub-hint">Selección de formato PNG o JPEG y resolución ajustable</p>
+        <h3>Arrastra un PDF aquí</h3>
+        <p>o toca para seleccionar · Cada página se convertirá en imagen</p>
         <input type="file" id="inputPdfImg" accept=".pdf,application/pdf" />
       </div>
       <div class="file-list" id="listPdfImg"></div>
@@ -766,17 +757,17 @@
           <input type="number" id="imgQuality" min="0.1" max="1" step="0.1" value="0.92" />
         </label>
         <label>
-          Resolución:
+          Escala:
           <select id="imgScale">
             <option value="1">1× (72 dpi)</option>
-            <option value="1.5">1.5× (108 dpi)</option>
+            <option value="1.5">1.5×</option>
             <option value="2" selected>2× (144 dpi)</option>
-            <option value="3">3× (Alta calidad)</option>
+            <option value="3">3× (alta)</option>
           </select>
         </label>
       </div>
       <div class="name-field" id="nameImgOutWrap" style="display:none">
-        <label for="nameImgOut">Prefijo de los archivos de salida</label>
+        <label for="nameImgOut">Prefijo de las imágenes</label>
         <div class="name-input-wrap">
           <input type="text" id="nameImgOut" placeholder="pagina" autocomplete="off" spellcheck="false" />
           <span class="ext" id="extImgOut">-001.png</span>
@@ -790,18 +781,18 @@
       </div>
       <div class="progress-wrap" id="progPdfImg">
         <div class="progress-bar"><div class="progress-fill" id="fillPdfImg"></div></div>
-        <div class="progress-text" id="textPdfImg">Preparando renderizado...</div>
+        <div class="progress-text" id="textPdfImg">Preparando...</div>
       </div>
       <div class="result" id="resultPdfImg">
-        <div class="success-icon">✓</div>
-        <p id="msgPdfImg">Imágenes generadas correctamente</p>
+        <div class="success-icon">✅</div>
+        <p id="msgPdfImg">¡Imágenes listas!</p>
         <div id="dlPdfImgLinks" style="display:flex;flex-wrap:wrap;gap:0.6rem;justify-content:center"></div>
       </div>
     </section>
   </main>
 
   <footer>
-    <strong>Conversor de Documentos</strong> · Procesamiento privado directamente en su dispositivo
+    <img class="gatopanzon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKXUqVoAdnf8bKI7mKdXSWG3W8uqB_-1pZPeRh5EJ3HzwrVrL4gzmscAw&s=10" alt="comprate datos">
   </footer>
 
   <div class="toast" id="toast"></div>
@@ -876,11 +867,11 @@
         link.click();
         link.remove();
         setTimeout(() => URL.revokeObjectURL(url), 60000);
-        showToast('Si se abre una vista previa, verifique el nombre al guardar en Archivos.');
+        showToast('Si se abre una vista previa, revisa el nombre al guardar en Archivos.');
       } catch (err) {
         if (err.name !== 'AbortError') {
           console.error(err);
-          showToast('No se pudo guardar el archivo. Intente abrir la página en Safari.', 'error');
+          showToast('No se pudo guardar. Abre la página en Safari con HTTPS e inténtalo de nuevo.', 'error');
         }
       } finally {
         isSharingFile = false;
@@ -936,11 +927,11 @@
       const imgs = Array.from(files).filter(f =>
         f.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp)$/i.test(f.name)
       );
-      if (!imgs.length) return showToast('Seleccione únicamente archivos de imagen válidos.', 'error');
+      if (!imgs.length) return showToast('Solo se aceptan imágenes', 'error');
 
       imgs.forEach(f => {
         if (f.size > 200 * 1024 * 1024) {
-          showToast(`Archivo de gran tamaño: ${f.name} (${formatSize(f.size)})`);
+          showToast(`Archivo grande: ${f.name} (${formatSize(f.size)})`);
         }
         imgItems.push({
           file: f,
@@ -951,7 +942,7 @@
 
       const nameInput = document.getElementById('nameImg');
       if (!nameInput.value.trim() && imgs[0]) {
-        nameInput.value = (imgs[0].name.replace(/\.[^.]+$/, '') || 'documento-convertido');
+        nameInput.value = (imgs[0].name.replace(/\.[^.]+$/, '') || 'imagenes-convertidas');
       }
       renderImgList();
     });
@@ -977,13 +968,13 @@
             <div class="size">${formatSize(f.size)} ${rotBadge}</div>
           </div>
           <div class="item-controls">
-            <button type="button" class="icon-btn" title="Rotar 90° a la izquierda" data-rotl="${i}">↺</button>
-            <button type="button" class="icon-btn" title="Rotar 90° a la derecha" data-rotr="${i}">↻</button>
+            <button type="button" class="icon-btn" title="Rotar 90° izquierda" data-rotl="${i}">↺</button>
+            <button type="button" class="icon-btn" title="Rotar 90° derecha" data-rotr="${i}">↻</button>
             <div class="order-btns">
-              <button type="button" title="Mover arriba" data-up="${i}">▲</button>
-              <button type="button" title="Mover abajo" data-down="${i}">▼</button>
+              <button type="button" title="Subir" data-up="${i}">▲</button>
+              <button type="button" title="Bajar" data-down="${i}">▼</button>
             </div>
-            <button type="button" class="icon-btn remove" title="Eliminar imagen" data-i="${i}">✕</button>
+            <button type="button" class="icon-btn remove" title="Eliminar" data-i="${i}">✕</button>
           </div>
         `;
         list.appendChild(item);
@@ -1167,17 +1158,17 @@
           });
         }
 
-        text.textContent = 'Compilando documento PDF...';
+        text.textContent = 'Generando PDF...';
         fill.style.width = '95%';
         const pdfBytes = await pdfDoc.save();
         lastPdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
         fill.style.width = '100%';
-        text.textContent = 'Proceso completado.';
+        text.textContent = '¡Listo!';
         resultBox.classList.add('show');
-        showToast('Documento PDF generado correctamente.', 'success');
+        showToast('PDF generado correctamente', 'success');
       } catch (err) {
         console.error(err);
-        showToast('Error al generar el PDF: ' + (err.message || 'error inesperado'), 'error');
+        showToast('Error: ' + (err.message || 'No se pudo generar el PDF'), 'error');
       } finally {
         btn.disabled = false;
         setTimeout(() => prog.classList.remove('show'), 800);
@@ -1186,7 +1177,7 @@
 
     document.getElementById('dlImg').onclick = () => {
       if (lastPdfBlob) {
-        const base = sanitizeName(document.getElementById('nameImg').value, 'documento-convertido');
+        const base = sanitizeName(document.getElementById('nameImg').value, 'imagenes-convertidas');
         downloadOrOpen(lastPdfBlob, base + '.pdf');
       }
     };
@@ -1197,7 +1188,7 @@
 
     setupDropZone('dropPdfWord', 'inputPdfWord', files => {
       const f = files[0];
-      if (!isPdfFile(f)) return showToast('Seleccione un archivo PDF válido.', 'error');
+      if (!isPdfFile(f)) return showToast('Selecciona un PDF', 'error');
       pdfWordFile = f;
       const nameInput = document.getElementById('nameWord');
       nameInput.value = f.name.replace(/\.pdf$/i, '') || 'documento';
@@ -1220,7 +1211,7 @@
             <div class="name">${pdfWordFile.name}</div>
             <div class="size">${formatSize(pdfWordFile.size)}</div>
           </div>
-          <button type="button" class="icon-btn remove" title="Eliminar archivo" id="rmPdfWord">✕</button>
+          <button type="button" class="icon-btn remove" id="rmPdfWord">✕</button>
         </div>`;
       document.getElementById('rmPdfWord').onclick = () => {
         pdfWordFile = null;
@@ -1241,7 +1232,7 @@
     document.getElementById('btnPdf2Word').onclick = async () => {
       if (!pdfWordFile) return;
       if (!window.docx) {
-        return showToast('No se pudo cargar el módulo de Word. Verifique su conexión.', 'error');
+        return showToast('No se pudo cargar la librería de Word. Revisa tu conexión.', 'error');
       }
 
       const btn = document.getElementById('btnPdf2Word');
@@ -1254,7 +1245,7 @@
       resultBox.classList.remove('show');
 
       try {
-        text.textContent = 'Analizando documento PDF...';
+        text.textContent = 'Cargando PDF...';
         fill.style.width = '10%';
         const bytes = await pdfWordFile.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
@@ -1265,7 +1256,7 @@
         let totalExtractedChars = 0;
 
         for (let i = 1; i <= numPages; i++) {
-          text.textContent = `Extrayendo contenido de la página ${i} de ${numPages}...`;
+          text.textContent = `Extrayendo texto página ${i} de ${numPages}...`;
           fill.style.width = (10 + (i / numPages) * 70) + '%';
 
           const page = await pdf.getPage(i);
@@ -1346,15 +1337,15 @@
         }
 
         if (totalExtractedChars === 0) {
-          showToast('El documento PDF no contiene texto seleccionable (posible documento escaneado).', 'error');
+          showToast('Este PDF parece ser solo imagen escaneada (sin texto seleccionable).', 'error');
           children.push(
             new Paragraph({
-              children: [new TextRun({ text: '(Este documento PDF no contiene texto seleccionable; parece corresponder a un archivo escaneado o compuesto únicamente por imágenes.)', italics: true, size: 22 })]
+              children: [new TextRun({ text: '(Sin texto extraíble)', italics: true, size: 22 })]
             })
           );
         }
 
-        text.textContent = 'Generando archivo DOCX...';
+        text.textContent = 'Generando documento Word...';
         fill.style.width = '90%';
 
         const doc = new Document({
@@ -1367,14 +1358,14 @@
         const blob = await Packer.toBlob(doc);
         lastDocxBlob = blob;
         fill.style.width = '100%';
-        text.textContent = 'Proceso completado.';
+        text.textContent = '¡Listo!';
         resultBox.classList.add('show');
         if (totalExtractedChars > 0) {
-          showToast('Documento Word generado correctamente.', 'success');
+          showToast('Documento Word generado', 'success');
         }
       } catch (err) {
         console.error(err);
-        showToast('Error al convertir a Word: ' + (err.message || 'error inesperado'), 'error');
+        showToast('Error: ' + (err.message || 'No se pudo convertir'), 'error');
       } finally {
         btn.disabled = false;
         setTimeout(() => prog.classList.remove('show'), 800);
@@ -1394,12 +1385,10 @@
 
     setupDropZone('dropPdfImg', 'inputPdfImg', files => {
       const f = files[0];
-      if (!isPdfFile(f)) return showToast('Seleccione un archivo PDF válido.', 'error');
+      if (!isPdfFile(f)) return showToast('Selecciona un PDF', 'error');
       pdfImgFile = f;
       const nameInput = document.getElementById('nameImgOut');
-      if (!nameInput.value.trim()) {
-        nameInput.value = f.name.replace(/\.pdf$/i, '') || 'pagina';
-      }
+      if (!nameInput.value.trim()) nameInput.value = 'pagina';
       renderPdfImgList();
       updateExtImgOut();
     });
@@ -1434,7 +1423,7 @@
             <div class="name">${pdfImgFile.name}</div>
             <div class="size">${formatSize(pdfImgFile.size)}</div>
           </div>
-          <button type="button" class="icon-btn remove" title="Eliminar archivo" id="rmPdfImg">✕</button>
+          <button type="button" class="icon-btn remove" id="rmPdfImg">✕</button>
         </div>`;
       document.getElementById('rmPdfImg').onclick = () => {
         pdfImgFile = null;
@@ -1469,7 +1458,7 @@
       clearGeneratedImgUrls();
 
       try {
-        text.textContent = 'Cargando documento PDF...';
+        text.textContent = 'Cargando PDF...';
         fill.style.width = '5%';
         const bytes = await pdfImgFile.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
@@ -1516,14 +1505,14 @@
 
             const tip = document.createElement('div');
             tip.className = 'ios-img-tip';
-            tip.textContent = 'Mantenga presionada la imagen para guardarla en Fotos o utilice el botón:';
+            tip.textContent = 'Mantén presionada la imagen para guardarla en Fotos o usa el botón:';
             block.appendChild(tip);
 
             const shareBtn = document.createElement('button');
             shareBtn.type = 'button';
             shareBtn.className = 'btn btn-secondary';
             shareBtn.style.fontSize = '0.85rem';
-            shareBtn.textContent = `Guardar página ${i}`;
+            shareBtn.textContent = `Guardar Pág. ${i}`;
             shareBtn.onclick = () => downloadOrOpen(blob, filename);
             block.appendChild(shareBtn);
 
@@ -1534,7 +1523,7 @@
             a.download = filename;
             a.className = 'btn btn-secondary';
             a.style.fontSize = '0.85rem';
-            a.textContent = `Descargar pág. ${i}`;
+            a.textContent = `⬇️ Pág. ${i}`;
             links.appendChild(a);
           }
         }
@@ -1544,7 +1533,7 @@
           allBtn.type = 'button';
           allBtn.className = 'btn btn-primary';
           allBtn.style.cssText = 'width:100%; margin-top:0.5rem;';
-          allBtn.textContent = `Descargar todas las páginas (${generatedItems.length})`;
+          allBtn.textContent = `⬇️ Descargar todas (${generatedItems.length})`;
           allBtn.onclick = async () => {
             for (const item of generatedItems) {
               saveAs(item.blob, item.filename);
@@ -1555,13 +1544,13 @@
         }
 
         fill.style.width = '100%';
-        text.textContent = 'Proceso completado.';
-        document.getElementById('msgPdfImg').textContent = `${numPages} imagen(es) generada(s) correctamente`;
+        text.textContent = '¡Listo!';
+        document.getElementById('msgPdfImg').textContent = `${numPages} imagen(es) lista(s)`;
         resultBox.classList.add('show');
-        showToast(`${numPages} imagen(es) generada(s) correctamente.`, 'success');
+        showToast(`${numPages} imagen(es) generadas`, 'success');
       } catch (err) {
         console.error(err);
-        showToast('Error al exportar imágenes: ' + (err.message || 'error inesperado'), 'error');
+        showToast('Error: ' + (err.message || 'No se pudo convertir'), 'error');
       } finally {
         btn.disabled = false;
         setTimeout(() => prog.classList.remove('show'), 800);
